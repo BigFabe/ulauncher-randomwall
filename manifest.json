@@ -1,0 +1,34 @@
+{
+    "required_api_version": "2",
+    "name": "Unsplash Extension",
+    "description": "Extension Description",
+    "developer_name": "Fabian",
+    "icon": "images/icon.jpeg",
+    "options": {
+      "query_debounce": 1
+    },
+    "preferences": [
+      {
+        "id": "wallpaper_kw",
+        "type": "keyword",
+        "name": "Wallpaper",
+        "description": "",
+        "default_value": "wp"
+      },
+      {
+        "id": "api_key",
+        "type": "text",
+        "name": "API Key",
+        "description": "Get the Access Key from https://unsplash.com/developers",
+        "default_value": ""
+      },
+      {
+        "id": "query",
+        "type": "text",
+        "name": "Query",
+        "description": "Optional search terms, separated by commas without whitespaces, e.g. nature,forest,city",
+        "default_value": ""
+      }
+    ]
+  }
+  
