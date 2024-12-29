@@ -25,10 +25,24 @@
       {
         "id": "service",
         "type": "select",
-        "name": "Service",
+        "name": "Service for Wallpapers",
         "description": "",
         "options": ["Unsplash", "Wallhaven.cc"],
         "default_value": "Wallhaven.cc"
+      },
+      {
+        "id": "copy_location",
+        "type": "text",
+        "name": "Copy location",
+        "description": "If you wish to copy the current wallpaper to a custom location, e.g. your wallpaper folder, input the location here.",
+        "default_value": ""
+      },
+      {
+        "id": "copy_shortcut",
+        "type": "text",
+        "name": "Copy Shortcut",
+        "description": "The shortcut to copy.",
+        "default_value": "cp"
       }
     ]
   }

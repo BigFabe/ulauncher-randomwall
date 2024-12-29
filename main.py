@@ -27,8 +27,17 @@ class RandomwallU(Extension):
 class KeywordQueryEventListener(EventListener):
 
     def on_event(self, event, extension):
-    
+        
+        chosen_copy_shortcut = extension.preferences["copy_shortcut"]
+        
         try:
+            if event.get_argument() == chosen_copy_shortcut:
+                return RenderResultListAction([
+                    ExtensionResultItem(icon=ext_icon,
+                                        name="Enter name of file.",
+                                        on_enter=ExtensionCustomAction(data = event.get_argument()))
+                ])
+            
             return RenderResultListAction([
                 ExtensionResultItem(icon=ext_icon,
                                     name=event.get_argument(),
@@ -38,8 +47,8 @@ class KeywordQueryEventListener(EventListener):
         except:
             return RenderResultListAction([
                 ExtensionResultItem(icon=ext_icon,
-                                    name="Enter Searchstring or leave empty for super random",
-                                    on_enter = ExtensionCustomAction(data = event.get_argument()))
+                                    name="Enter a category or press enter to search everything.",
+                                    on_enter = ExtensionCustomAction(data = ""))
             ])
 
 
@@ -50,7 +59,23 @@ class ItemEnterEventListener(EventListener):
         img_dir = os.path.dirname(os.path.realpath(__file__))
         api_key = extension.preferences['api_key']
         chosen_service = extension.preferences["service"]
-
+        chosen_copy_location = extension.preferences["copy_location"]
+        chosen_copy_shortcut = extension.preferences["copy_shortcut"]
+        
+        if chosen_copy_shortcut in search_term:
+            try:    
+                if chosen_copy_location[-1]=="/":
+                    chosen_copy_location = chosen_copy_location[:-1]
+            except IndexError:
+                extension.show_notification("Error", "Set location in Extension Settings.")
+                return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
+                                                            name = "Set location in Extension Settings.",
+                                                            on_enter = HideWindowAction())])
+            os.system(f"cp {img_dir}/randomimg.png {chosen_copy_location}/{search_term[len(chosen_copy_shortcut)+1:]}")
+            extension.show_notification("Success", "Copied image.")
+            return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
+                                                            name = "Copied image.",
+                                                            on_enter = HideWindowAction())])
 
         if chosen_service == "Unsplash":
             try:
@@ -68,6 +93,14 @@ class ItemEnterEventListener(EventListener):
                 return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                             name = f"No connection to {chosen_service}",
                                                             on_enter = HideWindowAction())])
+        else:
+            try:
+                wallhaven_download(search_term, img_dir)
+            except:
+                extension.show_notification("Error", "No Results")
+                return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
+                                                            name = f"No connection to {chosen_service}",
+                                                            on_enter = HideWindowAction())])            
 
 
         desktop_env = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
