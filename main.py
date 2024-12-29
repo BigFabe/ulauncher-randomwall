@@ -63,6 +63,7 @@ class ItemEnterEventListener(EventListener):
         chosen_copy_shortcut = extension.preferences["copy_shortcut"]
         
         if chosen_copy_shortcut in search_term:
+            
             try:    
                 if chosen_copy_location[-1]=="/":
                     chosen_copy_location = chosen_copy_location[:-1]
@@ -71,7 +72,10 @@ class ItemEnterEventListener(EventListener):
                 return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                             name = "Set location in Extension Settings.",
                                                             on_enter = HideWindowAction())])
-            os.system(f"cp {img_dir}/randomimg.png {chosen_copy_location}/{search_term[len(chosen_copy_shortcut)+1:]}")
+            
+            source = f"{img_dir}/randomimg.png"
+            dest = os.path.expanduser(f"{chosen_copy_location}/{search_term[len(chosen_copy_shortcut)+1:]}")
+            os.system(f"cp '{source}' '{dest}'")
             extension.show_notification("Success", "Copied image.")
             return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                             name = "Copied image.",
