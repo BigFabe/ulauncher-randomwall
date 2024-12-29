@@ -1,11 +1,11 @@
 {
     "required_api_version": "2",
-    "name": "Unsplash Extension",
-    "description": "Extension Description",
+    "name": "randomwall",
+    "description": "A ulauncher extensions, which lets you easily set random wallpaper.",
     "developer_name": "Fabian",
     "icon": "images/icon.jpeg",
     "options": {
-      "query_debounce": 1
+      "query_debounce": 0.05
     },
     "preferences": [
       {
@@ -19,14 +19,7 @@
         "id": "api_key",
         "type": "text",
         "name": "API Key",
-        "description": "Get the Access Key from https://unsplash.com/developers",
-        "default_value": ""
-      },
-      {
-        "id": "query",
-        "type": "text",
-        "name": "Query",
-        "description": "Optional search terms, separated by commas without whitespaces, e.g. nature,forest,city",
+        "description": "Get a Access Key from https://unsplash.com/developers",
         "default_value": ""
       }
     ]
