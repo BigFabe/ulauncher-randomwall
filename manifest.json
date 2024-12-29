@@ -1,7 +1,7 @@
 {
     "required_api_version": "2",
-    "name": "randomwall",
-    "description": "A ulauncher extensions, which lets you easily set random wallpaper.",
+    "name": "RandomwallU",
+    "description": "A ulauncher extensions, which lets you easily set random wallpapers.",
     "developer_name": "Fabian",
     "icon": "images/icon.jpeg",
     "options": {
