@@ -8,15 +8,20 @@ from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAct
 import os
 import logging
 from src.servicedownload import unsplash_download, wallhaven_download
+from gi.repository import Notify
 
 ext_icon = "images/icon.jpeg"
 
-class DemoExtension(Extension):
+class RandomwallU(Extension):
 
     def __init__(self):
         super().__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
+    
+    def show_notification(self, title, text=None, icon="images/icon.jpeg"):
+        Notify.init("RandomwallU")
+        Notify.Notification.new(title, text, icon).show()
 
 
 class KeywordQueryEventListener(EventListener):
@@ -37,19 +42,21 @@ class KeywordQueryEventListener(EventListener):
                                     on_enter = ExtensionCustomAction(data = event.get_argument()))
             ])
 
-class ItemEnterEventListener(EventListener):
 
+class ItemEnterEventListener(EventListener):
 
     def on_event(self, event, extension):
         search_term = event.get_data()
         img_dir = os.path.dirname(os.path.realpath(__file__))
         api_key = extension.preferences['api_key']
         chosen_service = extension.preferences["service"]
-        
+
+
         if chosen_service == "Unsplash":
             try:
                 unsplash_download(search_term, api_key, img_dir)
             except:
+                extension.show_notification("Error", "No Results")
                 return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                             name = "No API Key!",
                                                             on_enter = HideWindowAction())])
@@ -57,13 +64,14 @@ class ItemEnterEventListener(EventListener):
             try:
                 wallhaven_download(search_term, img_dir)
             except:
+                extension.show_notification("Error", "No Results")
                 return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                             name = f"No connection to {chosen_service}",
                                                             on_enter = HideWindowAction())])
 
 
         desktop_env = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
-        logging.info(img_dir)
+        
         if "gnome" in desktop_env:
             os.system(f'gsettings set org.gnome.desktop.background picture-uri-dark "file://{img_dir}/randomimg.png"')
             os.system(f'gsettings set org.gnome.desktop.background picture-uri "file://{img_dir}/randomimg.png"')
@@ -75,15 +83,16 @@ class ItemEnterEventListener(EventListener):
             os.system(f'gsettings set org.cinnamon.desktop.background picture-uri-dark "file://{img_dir}/randomimg.png"')
             os.system(f'gsettings set org.cinnamon.desktop.background picture-uri "file://{img_dir}/randomimg.png"')
         else:
+            extension.show_notification("Error", f"{desktop_env} not supported")
             return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                            name = f"{desktop_env} not supported!",
                                                            on_enter = HideWindowAction())])
 
-        
+       
         return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                            name = "Wallpaper set",
                                                            on_enter = HideWindowAction())])
         
 
 if __name__ == '__main__':
-    DemoExtension().run()
+    RandomwallU().run()
