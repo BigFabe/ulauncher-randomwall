@@ -4,39 +4,53 @@ from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
 from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
+from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 import os
 import requests
 
+
+ext_icon = "images/icon.jpeg"
 
 class DemoExtension(Extension):
 
     def __init__(self):
         super().__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
+        self.subscribe(ItemEnterEvent, ItemEnterEventListener())
 
 
 class KeywordQueryEventListener(EventListener):
 
     def on_event(self, event, extension):
+    
+        try:
+            return RenderResultListAction([
+                ExtensionResultItem(icon=ext_icon,
+                                    name=event.get_argument(),
+                                    on_enter=ExtensionCustomAction(data = event.get_argument()))
+            ])
         
+        except:
+            return RenderResultListAction([
+                ExtensionResultItem(icon=ext_icon,
+                                    name="Enter Searchstring",
+                                    on_enter = HideWindowAction())
+            ])
+
+class ItemEnterEventListener(EventListener):
+
+
+    def on_event(self, event, extension):
+        search_term = event.get_data()
         img_dir = os.path.dirname(os.path.realpath(__file__))
-        
-        
         api_key = extension.preferences['api_key']
         
-        
-        query = extension.preferences['query']
-        if len(query) != 0:
-            params={"query":query, "orientation":"landscape"}
-        else:
-            params={"orientation":"landscape"}
-      
-            
 
+        params={"query":search_term, "orientation":"landscape"}
         request = requests.get(f"https://api.unsplash.com/photos/random?client_id={api_key}", params=params)
         
         if request.status_code != 200:
-            return RenderResultListAction([ExtensionResultItem(icon = "images/icon.jpeg",
+            return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                                name = "No API Key!",
                                                                on_enter = HideWindowAction())])
         
@@ -57,12 +71,12 @@ class KeywordQueryEventListener(EventListener):
             os.system(f'gsettings set org.cinnamon.desktop.background picture-uri-dark "file:///{img_dir}/randomimg.png"')
             os.system(f'gsettings set org.cinnamon.desktop.background picture-uri "file:///{img_dir}/randomimg.png"')
         else:
-            return RenderResultListAction([ExtensionResultItem(icon = "images/icon.jpeg",
+            return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                            name = f"{desktop_env} not supported!",
                                                            on_enter = HideWindowAction())])
 
-
-        return RenderResultListAction([ExtensionResultItem(icon = "images/icon.jpeg",
+        
+        return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                            name = "Wallpaper set",
                                                            on_enter = HideWindowAction())])
         
