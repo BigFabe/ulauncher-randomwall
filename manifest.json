@@ -18,9 +18,17 @@
       {
         "id": "api_key",
         "type": "text",
-        "name": "API Key",
+        "name": "API Key form Unsplash",
         "description": "Get a Access Key from https://unsplash.com/developers",
-        "default_value": ""
+        "default_value": "R8FLX5BJNsevwauvgwqCzMEq7KWeBhGI7NQIVaq9Ubc"
+      },
+      {
+        "id": "service",
+        "type": "select",
+        "name": "Service",
+        "description": "",
+        "options": ["Unsplash", "Wallhaven.cc"],
+        "default_value": "Wallhaven.cc"
       }
     ]
   }
