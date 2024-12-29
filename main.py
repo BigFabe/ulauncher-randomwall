@@ -6,8 +6,8 @@ from ulauncher.api.shared.action.RenderResultListAction import RenderResultListA
 from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 import os
-import requests
-
+import logging
+from src.servicedownload import unsplash_download, wallhaven_download
 
 ext_icon = "images/icon.jpeg"
 
@@ -33,8 +33,8 @@ class KeywordQueryEventListener(EventListener):
         except:
             return RenderResultListAction([
                 ExtensionResultItem(icon=ext_icon,
-                                    name="Enter Searchstring",
-                                    on_enter = HideWindowAction())
+                                    name="Enter Searchstring or leave empty for super random",
+                                    on_enter = ExtensionCustomAction(data = event.get_argument()))
             ])
 
 class ItemEnterEventListener(EventListener):
@@ -44,32 +44,36 @@ class ItemEnterEventListener(EventListener):
         search_term = event.get_data()
         img_dir = os.path.dirname(os.path.realpath(__file__))
         api_key = extension.preferences['api_key']
+        chosen_service = extension.preferences["service"]
         
+        if chosen_service == "Unsplash":
+            try:
+                unsplash_download(search_term, api_key, img_dir)
+            except:
+                return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
+                                                            name = "No API Key!",
+                                                            on_enter = HideWindowAction())])
+        elif chosen_service == "Wallhaven.cc":
+            try:
+                wallhaven_download(search_term, img_dir)
+            except:
+                return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
+                                                            name = f"No connection to {chosen_service}",
+                                                            on_enter = HideWindowAction())])
 
-        params={"query":search_term, "orientation":"landscape"}
-        request = requests.get(f"https://api.unsplash.com/photos/random?client_id={api_key}", params=params)
-        
-        if request.status_code != 200:
-            return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
-                                                               name = "No API Key!",
-                                                               on_enter = HideWindowAction())])
-        
-        link=request.json()["links"]["download"]
-
-        os.system(f"wget {link} -O {img_dir}/randomimg.png")
 
         desktop_env = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
-        
+        logging.info(img_dir)
         if "gnome" in desktop_env:
-            os.system(f'gsettings set org.gnome.desktop.background picture-uri-dark "file:///{img_dir}/randomimg.png"')
-            os.system(f'gsettings set org.gnome.desktop.background picture-uri "file:///{img_dir}/randomimg.png"')
+            os.system(f'gsettings set org.gnome.desktop.background picture-uri-dark "file://{img_dir}/randomimg.png"')
+            os.system(f'gsettings set org.gnome.desktop.background picture-uri "file://{img_dir}/randomimg.png"')
         elif "kde" in desktop_env:
             os.system(f"plasma-apply-wallpaperimage {img_dir}/randomimg.png")
         elif "mate" in desktop_env:
             os.system(f'gsettings set org.mate.background picture-filename "{img_dir}/randomimg.png"')
         elif "cinnamon" in desktop_env:
-            os.system(f'gsettings set org.cinnamon.desktop.background picture-uri-dark "file:///{img_dir}/randomimg.png"')
-            os.system(f'gsettings set org.cinnamon.desktop.background picture-uri "file:///{img_dir}/randomimg.png"')
+            os.system(f'gsettings set org.cinnamon.desktop.background picture-uri-dark "file://{img_dir}/randomimg.png"')
+            os.system(f'gsettings set org.cinnamon.desktop.background picture-uri "file://{img_dir}/randomimg.png"')
         else:
             return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                            name = f"{desktop_env} not supported!",
