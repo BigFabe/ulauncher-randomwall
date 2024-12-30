@@ -20,7 +20,7 @@
         "type": "text",
         "name": "API Key form Unsplash",
         "description": "Get a Access Key from https://unsplash.com/developers",
-        "default_value": "R8FLX5BJNsevwauvgwqCzMEq7KWeBhGI7NQIVaq9Ubc"
+        "default_value": ""
       },
       {
         "id": "service",
