@@ -19,7 +19,7 @@ class RandomwallU(Extension):
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
     
-    def show_notification(self, title, text=None, icon="images/icon.jpeg"):
+    def show_notification(self, title, text=None, icon=ext_icon):
         Notify.init("RandomwallU")
         Notify.Notification.new(title, text, icon).show()
 
@@ -76,7 +76,7 @@ class ItemEnterEventListener(EventListener):
             source = f"{img_dir}/randomimg.png"
             dest = os.path.expanduser(f"{chosen_copy_location}/{search_term[len(chosen_copy_shortcut)+1:]}")
             os.system(f"cp '{source}' '{dest}'")
-            extension.show_notification("Success", "Copied image.")
+            extension.show_notification("Success", f"Copied image to {dest}")
             return RenderResultListAction([ExtensionResultItem(icon = ext_icon,
                                                             name = "Copied image.",
                                                             on_enter = HideWindowAction())])
